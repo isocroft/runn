@@ -8,6 +8,10 @@ const causePropertyIsMissingConfirmed = () => {
 };
 
 const hasWebkitMutationObserverAPI = () => {
+  if (typeof window === "undefined") {
+    // Not a browser environment - most likely
+    return false;
+  }
   /* @NOTE: This API is not present in Safari v1.0.0 till v5.1.7 */
   /* @NOTE: This API is only present in Safari v6.0.0 and above */
 
@@ -46,6 +50,15 @@ const canPatchErrorStackPropertyWithErrorCauses = () => {
     .toString()
       .toLowerCase()
         .indexOf("cause") === -1;
+};
+
+const patchEventTargetOnGlobalObject = () => {
+  if (typeof window === "undefined") {
+    if (typeof process !== "undefined") {
+      // NodeJS or Electron environment
+      process.window = new EventTarget();
+    }
+  }
 };
 
 const patchErrorPrototypeIfCausePropertyIsMissing = () => {
@@ -144,7 +157,7 @@ const isNotPromiseObject = (mayBePromise) => {
   return !isPromiseObject(mayBePromise);
 };
 
-
+patchEventTargetOnGlobalObject();
 patchErrorPrototypeIfCausePropertyIsMissing();
 patchErrorValueOfMethodIfCauseIsMissingFromErrorStackTrace();
 
@@ -176,7 +189,13 @@ runn.$$dispatchErrorEvent = (error) => {
   const event = new Event("log.promise.error_");
   event.error = error;
   event.timestampId = Date.now();
-  window.dispatchEvent(event);
+  if (typeof window === "undefined") {
+    if (typeof process !== "undefined") {
+      process.window.dispatchEvent(event);
+    }
+  } else {
+    window.dispatchEvent(event);
+  }
 };
 
 
@@ -232,7 +251,13 @@ class Deffered {
       event.timestampId = Date.now();
 
       /* @HINT: Dispatch error for logging */
-      window.dispatchEvent(event);
+      if (typeof window === "undefined") {
+        if (typeof process !== "undefined") {
+          process.window.dispatchEvent(event);
+        }
+      } else {
+        window.dispatchEvent(event);
+      }
 
       return this.mainError;
     }
