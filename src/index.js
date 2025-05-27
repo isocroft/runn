@@ -351,7 +351,8 @@ class Deffered {
             this.augumentError
           );
       }), this.mainError, this.syncObject, this._taskFnName, this.augumentError);
-    },
+    }
+
     die () {
       return this.then().catch((patchedError) => {
         let syncObject = this.syncObject;
@@ -369,7 +370,8 @@ class Deffered {
           // this = null;
         }
       });
-    },
+    }
+
     end () {
       const $promise = this.then().catch((patchedError) => {
         let syncObject = this.syncObject;
