@@ -8,13 +8,14 @@ This library is strictly for experimental and teaching purposes only. It can be 
 ## Example Code
 
 ```javascript
+const runn = require('runn');
 const { doSomethingFunc, doAnotherThingFunc, doAnotherBigThingFunc } = require('----');
 
 const __main__ = async () => {
-  run.$$sync = {};
+  runn.$$sync = {};
   try {
     const { value: output } = await (
-      run(main)
+      runn(main)
         .getResult
           .orThrow(
             "This program crashed!!"
@@ -23,19 +24,19 @@ const __main__ = async () => {
     );
     return output;
   } catch (error) {
-    run.$$dispatchErrorEvent(error);
+    runn.$$dispatchErrorEvent(error);
     throw error;
   } finally {
-    run.$$sync = null;
+    runn.$$sync = null;
   }
 };
 
 module.exports = __main__;
 
 function main () {
-  if (process.env.NODE_ENV === "PROD") {
+  if (process.env.NODE_ENV === "TEST") {
     return (
-      run(doSomethingFunc)
+      runn(doSomethingFunc)
         .getResult
           .asA
           .promise
@@ -43,7 +44,7 @@ function main () {
   }
 
   return (
-    run(doSomethingFunc)
+    runn(doSomethingFunc)
       .getResult
         .orThrow(
           new Error("The `main` function failed");
