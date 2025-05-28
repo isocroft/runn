@@ -46,7 +46,7 @@ const canPatchErrorStackPropertyWithErrorCauses = () => {
     
     The logic below may not be correct - I'm unsure
   */
-  retrun (new Error("test message"))
+  return (new Error("test message"))
     .toString()
       .toLowerCase()
         .indexOf("cause") === -1;
