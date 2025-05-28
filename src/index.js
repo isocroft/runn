@@ -77,7 +77,7 @@ const patchErrorPrototypeIfCausePropertyIsMissing = () => {
   }
 };
 
-const patchStackPropertyIfCauseIsMissingFromErrorStackTrace = () => {
+const patchErrorValueOfMethodIfCauseIsMissingFromErrorStackTrace = () => {
   if (canPatchErrorStackPropertyWithErrorCauses()) {
     Error.prototype.valueOf = function valueOf () {
       let initialErrorStackTrace = this.stack;
