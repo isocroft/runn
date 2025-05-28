@@ -173,7 +173,9 @@ runn.$$groupAll = function (...promises) {
   };
 
   return Promise.all(promises).then(getCallbackForListOfValue(
-    promise.map((promise) => promise.__name)
+    promise.map((promise) => {
+      return isNotPromiseObject(promise) ? '_' : promise.__name
+    })
   )).catch((error) => {
     const syncObject = this.$$sync;
 
