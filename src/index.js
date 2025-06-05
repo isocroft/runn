@@ -7,7 +7,7 @@ const causePropertyIsMissingConfirmed = () => {
   return !('cause' in testError);
 };
 
-const hasWebkitMutationObserverAPI = () => {
+const hasSafariWebkitMutationObserverAPI = () => {
   if (typeof window === "undefined") {
     // Not a browser environment - most likely
     return false;
@@ -86,7 +86,7 @@ const patchErrorValueOfMethodIfCauseIsMissingFromErrorStackTrace = () => {
       let modifiedErrorStackTrace =  "";
       let tabsIndentCount = 0;
       const is_SpiderMonkey_Engine = !stackPropertyIsDataPropertyOnErrorInstance(this);
-      const is_JavaScriptCore_Engine = hasWebkitMutationObserverAPI();
+      const is_JavaScriptCore_Engine = hasSafariWebkitMutationObserverAPI();
       const rootCallStackTraceEntryRegex = is_SpiderMonkey_Engine || is_JavaScriptCore_Engine
         ? /((?:global code)?@(?:anonymous|[a-zA-Z0-9-_)(\]\[\.]):\d{1,}:\d{1,}(?=))/m
         : /(at (?:<anonymous>|[a-zA-Z0-9-_\)\(\]\[\.]):\d{1,}:\d{1,}(?=))/m;
@@ -99,7 +99,7 @@ const patchErrorValueOfMethodIfCauseIsMissingFromErrorStackTrace = () => {
         if (modifiedErrorStackTrace === "") {
           modifiedErrorStackTrace += initialErrorStackTrace.replace(
             rootCallStackTraceEntryRegex,
-            'reason: ' + (
+            '\n\r\r reason: ' + (
               currentCause instanceof Error
                 ? currentCause.stack.replace(
                     rootCallStackTraceEntryRegex,
@@ -111,7 +111,7 @@ const patchErrorValueOfMethodIfCauseIsMissingFromErrorStackTrace = () => {
         } else {
           modifiedErrorStackTrace += modifiedErrorStackTrace.replace(
             rootCallStackTraceEntryRegex,
-            'reason: ' + (
+            '\n\r\r reason: ' + (
               currentCause instanceof Error
                 ? currentCause.stack.replace(
                     rootCallStackTraceEntryRegex,
@@ -372,6 +372,11 @@ class Deffered {
           this.augumentError = null;
           // this = null;
         }
+      }).then((result) => {
+        if (result instanceof Error) {
+          throw result;
+        }
+        return result;
       });
     }
 
