@@ -64,6 +64,11 @@ function main () {
 }
 ```
 
+## Example Code (Browser)
+
+><img width="513" alt="Screenshot 2025-06-05 at 11 38 00 PM" src="https://github.com/user-attachments/assets/e242f159-2311-4f97-86db-85248c80aef5" />
+
+
 ## Licence
 
 MIT
