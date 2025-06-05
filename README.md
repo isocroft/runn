@@ -68,6 +68,11 @@ function main () {
 
 ><img width="513" alt="Screenshot 2025-06-05 at 11 38 00 PM" src="https://github.com/user-attachments/assets/e242f159-2311-4f97-86db-85248c80aef5" />
 
+#### Using A Script Tag
+
+```html
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/isocroft/runn@0.0.1/dist/runn.min.js"></script>
+```
 
 ## Licence
 
