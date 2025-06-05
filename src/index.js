@@ -17,7 +17,8 @@ const hasWebkitMutationObserverAPI = () => {
 
   try {
     /* @HINT: Check for a specific JavaScriptCore API */
-    if (typeof window.WebKitMutationObserver !== 'undefined') {
+    if (typeof window.WebKitMutationObserver !== 'undefined'
+      && typeof window.chrome !== 'object') {
       return true;
     }
   } catch {
