@@ -1,15 +1,23 @@
 # runn
 This is a mini-library that makes working with JavaScript Promises less verbose and stressful.
 
-## Getting Started
+## Motivation
 
 This library is strictly for experimental and teaching purposes only. It can be used to teach **Concurrency in JavaScript**.
 
-## Example Code
+## Getting Started
+
+This library does 3 things well:
+
+1. It abstracts over promises in a way that makes error handling with `.catch(...)` less verbose and compact.
+2. It modifies the error `.stack` property such that it chains all errors than occured deep in the  call chain with a parent context error instance.
+3. It removes the abstracts away the difference between _synchronous_ and _asynchronous_ functions. 
+
+## Example Code  (NodeJS)
 
 ```javascript
 const runn = require('runn');
-const { doSomethingFunc, doAnotherThingFunc, doAnotherBigThingFunc } = require('----');
+const { doSomethingFunc, doAnotherThingFunc, doAnotherBigThingFunc } = require('./tasks');
 
 const __main__ = async () => {
   runn.$$sync = {};
@@ -55,3 +63,7 @@ function main () {
   );
 }
 ```
+
+## Licence
+
+MIT
