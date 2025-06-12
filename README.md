@@ -9,9 +9,9 @@ This library is strictly for experimental and teaching purposes only. It can be 
 
 This library does 3 things well:
 
-1. It abstracts over promises in a way that makes error handling with `.catch(...)` less verbose and compact.
-2. It modifies the error `.stack` property such that it chains all errors than occured deep in the  call chain with a parent context error instance.
-3. It removes the abstracts away the difference between _synchronous_ and _asynchronous_ functions. 
+1. It abstracts over promises in a way that makes error handling with `.catch(...)` less verbose and more compact.
+2. It modifies the error stacktrace (`.stack` property) such that it chains all errors than occured deep in the  call chain with a parent context error instance.
+3. It removes or abstracts away the difference between _synchronous_ and _asynchronous_ functions. 
 
 ## Example Code  (NodeJS)
 
