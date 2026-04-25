@@ -391,8 +391,9 @@
           this.augumentError = null;
           
           if (result instanceof Error) {
-            this.mainError.cause = result;
-            throw this.mainError;
+            throw this._patchErrorObjectAndDispatchToLogger(
+              result
+            );
           }
           return result;
         });
