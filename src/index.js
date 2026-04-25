@@ -381,7 +381,8 @@
   
       die () {
         return this._promise.catch((patchedError) => {
-          this.mainError.cause = patchedError;
+          return patchedError;
+        }).then((result) => {
           /* @HINT: Release retained references for GC cleanup */
           
           //this.syncObject = null;
@@ -389,15 +390,9 @@
           this._taskFnName = null;
           this.augumentError = null;
           
-          return this.mainError;
-        }).then((result) => {
-          //this.syncObject = null;
-          this._promise = null;
-          this._taskFnName = null;
-          this.augumentError = null;
-          console.log("dkkdkkddkkd");
           if (result instanceof Error) {
-            throw result;
+            this.mainError.cause = result;
+            throw this.mainError;
           }
           return result;
         });
