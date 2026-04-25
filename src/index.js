@@ -267,7 +267,7 @@
         /* @HINT: Dispatch error for logging */
         if (typeof window === "undefined") {
           if (typeof process !== "undefined") {
-            setTimeout(() {
+            setTimeout(function _triggerEvent () {
               /* @HINT: Using events to log errors */
               const event = new Event("log.promise.error_");
               event.error = deffered.mainError;
@@ -276,7 +276,7 @@
             }, 700, this);
           }
         } else {
-          window.setTimeout((deffered) {
+          window.setTimeout(function _triggerEvent (deffered) {
             /* @HINT: Using events to log errors */
             const event = new Event("log.promise.error_");
             event.error = deffered.mainError;
