@@ -261,7 +261,7 @@
         ).replace(
           'runn',
           this._taskFnName
-        ).trim()) /* + currentStackString.substring(endOfErrorMessageLineIndex + 1); */
+        ).trim()) + currentStackString.substring(endOfErrorMessageLineIndex + 1, currentStackString.indexOf('\n\r\r reason: ', endOfErrorMessageLineIndex + 1));
         
         
         /* @HINT: Dispatch error for logging */
@@ -381,11 +381,17 @@
   
       die () {
         return this._promise.catch((patchedError) => {
+          let syncObject = this.syncObject;
+
+          if (syncObject !== null && typeof syncObject === "object") {
+            if (typeof syncObject['realeaseFromWait'] === 'function') {
+              syncObject.realeaseFromWait(this._taskFnName);
+            }
+          }
+          
           return patchedError;
         }).then((result) => {
           /* @HINT: Release retained references for GC cleanup */
-          
-          //this.syncObject = null;
           this._promise = null;
           this._taskFnName = null;
           
