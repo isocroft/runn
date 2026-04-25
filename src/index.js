@@ -380,7 +380,7 @@
       }
   
       die () {
-        return this._promise.catch((patchedError) => {
+        return this.then().catch((patchedError) => {
           return patchedError;
         }).then((result) => {
           /* @HINT: Release retained references for GC cleanup */
