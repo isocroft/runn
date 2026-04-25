@@ -464,11 +464,11 @@
     }
 
     if (syncObject !== null && typeof syncObject === "object") {
-      if (typeof syncObject['addNextToErrorStack'] === 'function') {
-        if (promise instanceof Error) {
-          syncObject.addNextToErrorStack(promise);
-        }
-      }
+      // if (typeof syncObject['addNextToErrorStack'] === 'function') {
+      //   if (promise instanceof Error) {
+      //     syncObject.addNextToErrorStack(promise);
+      //   }
+      // }
 
       if (typeof syncObject['addToWait'] === 'function') {
         syncObject.addToWait(taskFn.name);
@@ -508,6 +508,7 @@
               if (isErrorObject(promise)) {
                 const $promise = Promise.reject(promise.valueOf());
                 $promise.__name = taskFn.name;
+                error.cause = promise;
                 return new Deffered(
                   $promise,
                   error,
