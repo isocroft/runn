@@ -231,7 +231,15 @@
             );
         }
 
-        this._promise = promise;
+        this._promise = promise.catch((patchedError) => {
+          $error.cause = patchedError;
+        }).then((result) => {
+          if (result instanceof Error) {
+            throw result;
+          }
+          return result;
+        });
+        
         this.mainError = $error;
         this._taskFnName = taskFnName;
         this.syncObject = $$sync;
@@ -379,46 +387,23 @@
         }), this.mainError, this.syncObject, this._taskFnName, this.augumentError);
       }
   
-      die () {
-        return this.then().catch((patchedError) => {
-          let syncObject = this.syncObject;
-  console.log("did it run ?");
+      async die () {
+          console.log("did it run ?");
           try  {
-            let $error = patchedError;
-            let stackedError = typeof syncObject['getNextFromErrorStack'] === 'function'
-              ? syncObject.getNextFromErrorStack()
-              : null;
-
-            // Chain all errors from the error stack in turn
-            while (stackedError && stackedError instanceof Error) {
-              stackedError.cause = $error;
-              $error = stackedError;
-              stackedError = typeof syncObject['getNextFromErrorStack'] === 'function'
-                ? syncObject.getNextFromErrorStack()
-                : null;
-            }
-            /* @HINT: Terminate - with a BANG! */
-            throw patchedError;
+            throw this.mainError;
           } finally {
             /* @HINT: Release retained references for GC cleanup */
-            syncObject = null;
-            // this.mainError = null;
+            //this.syncObject = null;
             this._promise = null;
             this._taskFnName = null;
             this.augumentError = null;
           }
-        }).then((result) => {
-          if (result instanceof Error) {
-            throw result;
-          }
-          return result;
-        });
       }
   
       end () {
         const $promise = this.then().catch((patchedError) => {
           let syncObject = this.syncObject;
-  
+  console.log("ranny...");
           if (syncObject !== null && typeof syncObject === "object") {
             if (typeof syncObject['realeaseFromWait'] === 'function') {
               syncObject.realeaseFromWait(this._taskFnName);
@@ -464,12 +449,6 @@
     }
 
     if (syncObject !== null && typeof syncObject === "object") {
-      // if (typeof syncObject['addNextToErrorStack'] === 'function') {
-      //   if (promise instanceof Error) {
-      //     syncObject.addNextToErrorStack(promise);
-      //   }
-      // }
-
       if (typeof syncObject['addToWait'] === 'function') {
         syncObject.addToWait(taskFn.name);
       }
@@ -508,7 +487,7 @@
               if (isErrorObject(promise)) {
                 const $promise = Promise.reject(promise.valueOf());
                 $promise.__name = taskFn.name;
-                error.cause = promise;
+          
                 return new Deffered(
                   $promise,
                   error,
@@ -518,8 +497,9 @@
                 );
               }
   
-              const $promise = Promise.resolve(promise);
+              const $promise = promise;
               $promise.__name = taskFn.name;
+              
               return new Deffered(
                 $promise,
                 error,
