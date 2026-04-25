@@ -380,7 +380,7 @@
       }
   
       die () {
-        return this.then().catch((patchedError) => {
+        return this._promise.catch((patchedError) => {
           return patchedError;
         }).then((result) => {
           /* @HINT: Release retained references for GC cleanup */
@@ -388,7 +388,6 @@
           //this.syncObject = null;
           this._promise = null;
           this._taskFnName = null;
-          this.augumentError = null;
           
           if (result instanceof Error) {
             throw this._patchErrorObjectAndDispatchToLogger(
