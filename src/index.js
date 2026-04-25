@@ -231,16 +231,7 @@
             );
         }
 
-        this._promise = promise.catch((patchedError) => {
-          $error.cause = patchedError;
-          return $error;
-        }).then((result) => {
-          if (result instanceof Error) {
-            throw result;
-          }
-          return result;
-        });
-        
+        this._promise = promise;
         this.mainError = $error;
         this._taskFnName = taskFnName;
         this.syncObject = $$sync;
@@ -388,12 +379,28 @@
         }), this.mainError, this.syncObject, this._taskFnName, this.augumentError);
       }
   
-      async die () {
-            /* @HINT: Release retained references for GC cleanup */
-            //this.syncObject = null;
-            this._promise = null;
-            this._taskFnName = null;
-            this.augumentError = null;
+      die () {
+        return this._promise.catch((patchedError) => {
+          this.mainError.cause = patchedError;
+          /* @HINT: Release retained references for GC cleanup */
+          
+          //this.syncObject = null;
+          this._promise = null;
+          this._taskFnName = null;
+          this.augumentError = null;
+          
+          return $error;
+        }).then((result) => {
+          //this.syncObject = null;
+          this._promise = null;
+          this._taskFnName = null;
+          this.augumentError = null;
+          
+          if (result instanceof Error) {
+            throw result;
+          }
+          return result;
+        });
       }
   
       end () {
