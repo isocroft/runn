@@ -483,7 +483,7 @@
                 );
               }
   
-              const $promise = promise;
+              const $promise = Promise.resolve(promise);
               $promise.__name = taskFn.name;
               
               return new Deffered(
