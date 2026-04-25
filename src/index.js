@@ -235,7 +235,7 @@
         this.mainError = $error;
         this._taskFnName = taskFnName;
         this.syncObject = $$sync;
-        this.augumentError =  augErr;
+        this.augumentError = augErr;
       }
   
       _patchErrorObjectAndDispatchToLogger (
@@ -382,16 +382,16 @@
       die () {
         return this.then().catch((patchedError) => {
           let syncObject = this.syncObject;
-  
+  console.log("did it run ?");
           try  {
-            let $error = patchedError.cause;
+            let $error = patchedError;
             let stackedError = typeof syncObject['getNextFromErrorStack'] === 'function'
               ? syncObject.getNextFromErrorStack()
               : null;
 
             // Chain all errors from the error stack in turn
             while (stackedError && stackedError instanceof Error) {
-              $error.cause = queuedError;
+              stackedError.cause = $error;
               $error = stackedError;
               stackedError = typeof syncObject['getNextFromErrorStack'] === 'function'
                 ? syncObject.getNextFromErrorStack()
@@ -420,10 +420,6 @@
           let syncObject = this.syncObject;
   
           if (syncObject !== null && typeof syncObject === "object") {
-            if (typeof syncObject['addNextToErrorStack'] === 'function') {
-              syncObject.addNextToErrorStack(patchedError);
-            }
-
             if (typeof syncObject['realeaseFromWait'] === 'function') {
               syncObject.realeaseFromWait(this._taskFnName);
             }
@@ -461,16 +457,22 @@
   
     let syncObject = runn.$$sync;
   
-    if (syncObject !== null && typeof syncObject === "object") {
-      if (typeof syncObject['addToWait'] === 'function') {
-        syncObject.addToWait(taskFn.name);
-      }
-    }
-  
     try {
       promise = taskFn();
     } catch (syncError) {
       promise = syncError
+    }
+
+    if (syncObject !== null && typeof syncObject === "object") {
+      if (typeof syncObject['addNextToErrorStack'] === 'function') {
+        if (promise instanceof Error) {
+          syncObject.addNextToErrorStack(promise);
+        }
+      }
+
+      if (typeof syncObject['addToWait'] === 'function') {
+        syncObject.addToWait(taskFn.name);
+      }
     }
   
     return  {
