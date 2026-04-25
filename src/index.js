@@ -261,7 +261,7 @@
         ).replace(
           'runn',
           this._taskFnName
-        ).trim()) + currentStackString.substring(endOfErrorMessageLineIndex + 1, currentStackString.indexOf('\n\r\r reason: ', endOfErrorMessageLineIndex + 1));
+        ).trim()) + currentStackString.substring(endOfErrorMessageLineIndex + 1);
         
         
         /* @HINT: Dispatch error for logging */
