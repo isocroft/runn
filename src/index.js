@@ -233,6 +233,7 @@
 
         this._promise = promise.catch((patchedError) => {
           $error.cause = patchedError;
+          throw $error;
         }).then((result) => {
           if (result instanceof Error) {
             throw result;
@@ -388,22 +389,17 @@
       }
   
       async die () {
-          console.log("did it run ?");
-          try  {
-            throw this.mainError;
-          } finally {
             /* @HINT: Release retained references for GC cleanup */
             //this.syncObject = null;
             this._promise = null;
             this._taskFnName = null;
             this.augumentError = null;
-          }
       }
   
       end () {
         const $promise = this.then().catch((patchedError) => {
           let syncObject = this.syncObject;
-  console.log("ranny...");
+          
           if (syncObject !== null && typeof syncObject === "object") {
             if (typeof syncObject['realeaseFromWait'] === 'function') {
               syncObject.realeaseFromWait(this._taskFnName);
