@@ -130,7 +130,7 @@
                 currentCause instanceof Error
                   ? currentCause.stack.replace(
                       rootCallStackTraceEntryRegex,
-                      `${tabs}$1`
+                      `${tabs}`
                     )
                   : JSON.stringify(currentCause)
                 )
@@ -141,6 +141,12 @@
   
         if (modifiedErrorStackTrace !== "") {
           this.stack = modifiedErrorStackTrace;
+          console.log("||||| >>>>> ", modifiedErrorStackTrace.substring(
+            0,
+            modifiedErrorStackTrace.indexOf(
+              modifiedErrorStackTrace.substring(0, modifiedErrorStackTrace.indexOf('\n')), 
+            1))
+          );
         }
   
         return this;
