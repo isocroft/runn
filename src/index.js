@@ -296,45 +296,34 @@
   
       _normalizeReturnValuesOrError (
         mayBePromise,
-        error,
         callbackName
       ) {
   
         if (mayBePromise instanceof Deffered) {
-          return mayBePromise;
+          return mayBePromise._promise;
         }
   
-        if (error === "<no error>") {
-          let $promise = Promise.resolve(mayBePromise);
+        if (mayBePromise instanceof Error) {
+          let $promise = Promise.reject(mayBePromise);
           $promise.__name = callbackName;
-          return new Deffered(
-            $promise,
-            this.mainError,
-            this.syncObject,
-            callbackName,
-            this.augumentError
-          );
+          
+          return $promise;
         }
   
-        let $error = error;
+        let $error;
   
-        if (isNotErrorObject(error)) {
-          $error = typeof error === "string"
-            ? new Error(error)
+        if (isNotErrorObject(mayBePromise)) {
+          $error = typeof mayBePromise === "string"
+            ? new Error(mayBePromise)
             : new Error(
-              "Something went wrong: " + JSON.stringify(error)
+              "Something went wrong: " + JSON.stringify(mayBePromise)
             );
         }
   
         $promise = Promise.reject($error);
         $promise.__name = callbackName;
-        return new Deffered(
-          $promise,
-          this.mainError,
-          this.syncObject,
-          callbackName,
-          this.augumentError
-        );
+        
+        return $promise;
       }
   
       then (callback) {
@@ -347,8 +336,7 @@
         }
   
         return new Deffered(this._promise.then((result) => {
-          let mayBePromise = undefined;
-          let error = "<no error>";
+          let mayBePromise;
   
           try {
             mayBePromise = callback.call(
@@ -356,32 +344,20 @@
               result
             );
           } catch (syncError) {
-            error = syncError;
+            mayBePromise = syncError;
           }
   
           return isPromiseObject(mayBePromise)
-            ? (mayBePromise.__name = callback.name, new Deffered(
-                mayBePromise,
-                this.mainError,
-                this.syncObject,
-                callback.name,
-                this.augumentError
-              ))
+            ? (mayBePromise.__name = callback.name, mayBePromise)
             : this._normalizeReturnValuesOrError(
               mayBePromise,
-              error,
               callback.name
             );
         }, (reason) => {
             const $promise = Promise.reject(reason);
             $promise.__name = callback.name;
-            return new Deffered(
-              $promise,
-              this.mainError,
-              this.syncObject,
-              callback.name,
-              this.augumentError
-            );
+            
+          return $promise;
         }), this.mainError, this.syncObject, this._taskFnName, this.augumentError);
       }
   
