@@ -140,13 +140,13 @@
         }
   
         if (modifiedErrorStackTrace !== "") {
-          this.stack = modifiedErrorStackTrace;
-          console.log("||||| >>>>> ", modifiedErrorStackTrace.substring(
+          const $modifiedErrorStackTrace = modifiedErrorStackTrace.substring(
             0,
             modifiedErrorStackTrace.indexOf(
               modifiedErrorStackTrace.substring(0, modifiedErrorStackTrace.indexOf('\n')), 
-            1))
+            1)
           );
+          this.stack = $modifiedErrorStackTrace.trim() === "" ? modifiedErrorStackTrace : $modifiedErrorStackTrace;
         }
   
         return this;
