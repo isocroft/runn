@@ -233,7 +233,7 @@
 
         this._promise = promise.catch((patchedError) => {
           $error.cause = patchedError;
-          throw $error;
+          return $error;
         }).then((result) => {
           if (result instanceof Error) {
             throw result;
