@@ -389,13 +389,13 @@
           this._taskFnName = null;
           this.augumentError = null;
           
-          return $error;
+          return this.mainError;
         }).then((result) => {
           //this.syncObject = null;
           this._promise = null;
           this._taskFnName = null;
           this.augumentError = null;
-          
+          console.log("dkkdkkddkkd");
           if (result instanceof Error) {
             throw result;
           }
