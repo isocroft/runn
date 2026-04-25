@@ -153,7 +153,7 @@
   };
   
   const isNotErrorObject = (mayBeError) => {
-    return !mayBeError || !(mayBeError instanceof Error)
+    return !mayBeError || !(mayBeError instanceof Error);
   };
   
   const isPromiseObject = (mayBePromise) => {
@@ -196,8 +196,8 @@
       const syncObject = this.$$sync;
   
       if (syncObject !== null && typeof syncObject === "object") {
-        if (typeof syncObject['addWaitError'] === 'function') {
-          syncObject.addWaitError(error);
+        if (typeof syncObject['addNextToErrorStack'] === 'function') {
+          syncObject.addNextToErrorStack(error);
         }
       }
     });
@@ -230,7 +230,7 @@
               "Something went wrong: " + JSON.stringify(rootError)
             );
         }
-  
+
         this._promise = promise;
         this.mainError = $error;
         this._taskFnName = taskFnName;
@@ -241,9 +241,7 @@
       _patchErrorObjectAndDispatchToLogger (
         reasonError
       ) {
-        /* @HINT: Using events to log errors */
-        const event = new Event("log.promise.error_");
-  
+          
         this.mainError.cause = reasonError;
   
         const currentStackString = this.mainError.valueOf().stack;
@@ -265,16 +263,26 @@
           this._taskFnName
         ).trim()) + currentStackString.substring(endOfErrorMessageLineIndex + 1);
         
-        event.error = this.mainError;
-        event.timestampId = Date.now();
-  
+        
         /* @HINT: Dispatch error for logging */
         if (typeof window === "undefined") {
           if (typeof process !== "undefined") {
-            process.window.dispatchEvent(event);
+            setTimeout(() {
+              /* @HINT: Using events to log errors */
+              const event = new Event("log.promise.error_");
+              event.error = deffered.mainError;
+              event.timestampId = Date.now();
+              process.window.dispatchEvent(event);
+            }, 700, this);
           }
         } else {
-          window.dispatchEvent(event);
+          window.setTimeout((deffered) {
+            /* @HINT: Using events to log errors */
+            const event = new Event("log.promise.error_");
+            event.error = deffered.mainError;
+            event.timestampId = Date.now();
+            window.dispatchEvent(event);
+          }, 700, this);
         }
   
         return this.mainError;
@@ -376,6 +384,19 @@
           let syncObject = this.syncObject;
   
           try  {
+            let $error = patchedError.cause;
+            let stackedError = typeof syncObject['getNextFromErrorStack'] === 'function'
+              ? syncObject.getNextFromErrorStack()
+              : null;
+
+            // Chain all errors from the error stack in turn
+            while (stackedError && stackedError instanceof Error) {
+              $error.cause = queuedError;
+              $error = stackedError;
+              stackedError = typeof syncObject['getNextFromErrorStack'] === 'function'
+                ? syncObject.getNextFromErrorStack()
+                : null;
+            }
             /* @HINT: Terminate - with a BANG! */
             throw patchedError;
           } finally {
@@ -385,7 +406,6 @@
             this._promise = null;
             this._taskFnName = null;
             this.augumentError = null;
-            // this = null;
           }
         }).then((result) => {
           if (result instanceof Error) {
@@ -400,8 +420,11 @@
           let syncObject = this.syncObject;
   
           if (syncObject !== null && typeof syncObject === "object") {
+            if (typeof syncObject['addNextToErrorStack'] === 'function') {
+              syncObject.addNextToErrorStack(patchedError);
+            }
+
             if (typeof syncObject['realeaseFromWait'] === 'function') {
-              syncObject.addWaitError(patchedError);
               syncObject.realeaseFromWait(this._taskFnName);
             }
           }
